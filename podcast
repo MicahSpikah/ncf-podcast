@@ -1,21 +1,28 @@
 #!/usr/local/bin/fish
 
-# 4 args:
-#   youtube url
-#   start time
-#   stop time
-#   outfile name
+if test (count $argv) -lt 3
+    echo "Expected: ./podcast <youtube_url> <start_time> <stop_time> [output_filename]" 
+    return 1
+end
 
-rm -f $argv[4] 
-yt-dlp -o $argv[4] -f 140 $argv[1]
+if test (count $argv) -lt 4
+    set outname (date -v-sun "+%Y%m%d.m4a")
+else
+    set outname $argv[4]
+end
 
-ffmpeg -i $argv[4] -ss $argv[2] -to $argv[3] -acodec copy $argv[4].clipped.m4a -y
+echo "Exporting to $outname"
 
-set response (ffmpeg -i $argv[4] -af loudnorm=I=-16:print_format=json -f null - 2>&1 | string join ''  | string match -r '{.*}')
+rm -f $outname 
+yt-dlp -o $outname -f 140 $argv[1]
+
+ffmpeg -i $outname -ss $argv[2] -to $argv[3] -acodec copy $outname.clipped.m4a -y
+
+set response (ffmpeg -i $outname -af loudnorm=I=-16:print_format=json -f null - 2>&1 | string join ''  | string match -r '{.*}')
 set i (echo $response | jq '.input_i' | string match -r '[0-9-.]+')
 set tp (echo $response | jq '.input_tp' | string match -r '[0-9-.]+')
 set lra (echo $response | jq '.input_lra' | string match -r '[0-9-.]+')
 set thresh (echo $response | jq '.input_thresh' | string match -r '[0-9-.]+')
 set offset (echo $response | jq '.target_offset' | string match -r '[0-9-.]+')
-ffmpeg -i $argv[4].clipped.m4a -af loudnorm=measured_I=$i:measured_TP=$tp:measured_LRA=$lra:measured_thresh=$thresh:offset=$offset:I=-16:print_format=summary $argv[4] -y
-rm -f $argv[4].clipped.m4a
+ffmpeg -i $outname.clipped.m4a -af loudnorm=measured_I=$i:measured_TP=$tp:measured_LRA=$lra:measured_thresh=$thresh:offset=$offset:I=-16:print_format=summary $outname -y
+rm -f $outname.clipped.m4a
