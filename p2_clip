@@ -1,0 +1,4 @@
+#!/usr/local/bin/fish
+
+ffmpeg -i rawaudio.m4a -ss $argv[1] -to $argv[2] -acodec copy clipped.m4a -y
+afplay clipped.m4a

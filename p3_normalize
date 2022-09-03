@@ -1,0 +1,10 @@
+#!/usr/local/bin/fish
+
+mv clipped.m4a prenormalized.m4a
+set response (ffmpeg -i prenormalized.m4a -af loudnorm=I=-16:print_format=json -f null - 2>&1 | string join ''  | string match -r '{.*}')
+set i (echo $response | jq '.input_i' | string match -r '[0-9-.]+')
+set tp (echo $response | jq '.input_tp' | string match -r '[0-9-.]+')
+set lra (echo $response | jq '.input_lra' | string match -r '[0-9-.]+')
+set thresh (echo $response | jq '.input_thresh' | string match -r '[0-9-.]+')
+set offset (echo $response | jq '.target_offset' | string match -r '[0-9-.]+')
+ffmpeg -i prenormalized.m4a -af loudnorm=measured_I=$i:measured_TP=$tp:measured_LRA=$lra:measured_thresh=$thresh:offset=$offset:I=-16:print_format=summary $argv[1]
