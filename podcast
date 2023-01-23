@@ -1,23 +1,28 @@
 #!/usr/local/bin/fish
 
+# If we don't have at least three arguments, tell the user what we expect
+
 if test (count $argv) -lt 3
     echo "Expected: ./podcast <youtube_url> <start_time> <stop_time> [output_filename]" 
     return 1
 end
 
+# If we don't have the filename explicitly, generate it to be the date of the most recent Sunday
 if test (count $argv) -lt 4
     set outname (date -v-sun "+%Y%m%d.m4a")
 else
     set outname $argv[4]
 end
 
+# Export to file from youtube url
 echo "Exporting to $outname"
-
 rm -f $outname 
 yt-dlp -o $outname -f 140 $argv[1]
 
+# Clip the exported file to just the sermon
 ffmpeg -i $outname -ss $argv[2] -to $argv[3] -acodec copy $outname.clipped.m4a -y
 
+# Normalize the sermon audio - this makes it so that every week's podcast should be at about the same audio level
 set response (ffmpeg -i $outname -af loudnorm=I=-16:print_format=json -f null - 2>&1 | string join ''  | string match -r '{.*}')
 set i (echo $response | jq '.input_i' | string match -r '[0-9-.]+')
 set tp (echo $response | jq '.input_tp' | string match -r '[0-9-.]+')
