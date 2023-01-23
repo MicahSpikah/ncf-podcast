@@ -1,7 +1,6 @@
 #!/usr/local/bin/fish
 
 # If we don't have at least three arguments, tell the user what we expect
-
 if test (count $argv) -lt 3
     echo "Expected: ./podcast <youtube_url> <start_time> <stop_time> [output_filename]" 
     return 1
