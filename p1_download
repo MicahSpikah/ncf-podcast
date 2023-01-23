@@ -1,5 +1,0 @@
-#!/usr/local/bin/fish
-
-rm -f rawaudio.m4a rawaudio.m4a.part
-yt-dlp -o rawaudio.m4a -f 140 $argv[1]
-#open -a /System/Applications/QuickTime\ Player.app/ rawaudio.m4a
