@@ -2,8 +2,9 @@
 * fish
 * yt-dlp
 * ffmpeg
+* jq
 
-If you don't have these, download and install homebrew, then run `brew install fish yt-dlp ffmpeg`
+If you don't have these, download and install homebrew, then run `brew install fish yt-dlp ffmpeg jq`
 
 # Usage
 ./podcast \<youtube url\> \<start time\> \<stop time\> [output filename]

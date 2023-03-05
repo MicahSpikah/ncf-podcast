@@ -1,4 +1,4 @@
-#!/usr/local/bin/fish
+#!/usr/bin/env fish
 
 # If we don't have at least three arguments, tell the user what we expect
 if test (count $argv) -lt 3
